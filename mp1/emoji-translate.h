@@ -4,7 +4,15 @@
 extern "C" {
 #endif
 
-typedef struct _emoji_t {
+typedef struct  {
+unsigned char * source;
+unsigned char *translation;
+} EmojiRules;
+
+typedef struct {
+EmojiRules * rules;
+int size;
+int capacity;
 } emoji_t;
 
 void emoji_init(emoji_t *emoji);

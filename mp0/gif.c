@@ -496,7 +496,6 @@ render_frame_rect(gd_GIF *gif, uint8_t *buffer)
 }
 
 static void
-
 dispose(gd_GIF *gif)
 {
     int i, j, k;
@@ -784,6 +783,7 @@ ge_new_gif(
     write_num(gif->fd, height);
     store_gct = custom_gct = 0;
     if (palette) {
+
         _illinify(palette, depth);
         if (depth < 0)
             store_gct = 1;

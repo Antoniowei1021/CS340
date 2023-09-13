@@ -11,8 +11,6 @@ char *emoji_random_alloc();
 void emoji_invertChar(char *utf8str);
 void emoji_invertAll(char *utf8str);
 unsigned char *emoji_invertFile_alloc(const char *fileName);
-
-
 #ifdef __cplusplus
 }
 #endif

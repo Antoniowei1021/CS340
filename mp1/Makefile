@@ -6,7 +6,7 @@ ifneq (, $(shell which g++-11))
 CXX = g++-11 -gdwarf-4 $(CS340)
 else
 ifneq (, $(shell which g++))
-CXX = g++ -gdwrf-4 $(CS340)
+CXX = g++ -g $(CS340)
 else
 $(error No g++ compiler found.)
 endif
