@@ -51,7 +51,7 @@ void emoji_invertChar(unsigned char *utf8str) {
     } else if (strncmp(utf8str, "\xF0\x9F\x92\xA9", 4) == 0) {
         strncpy(utf8str, "\xF0\x9F\x8E\x80", 4); 
     } else if (strncmp(utf8str, "\xF0\x9F\x98\x8D", 4) == 0) { 
-        strncpy(str, "\xF0\x9F\x98\xA0", 4); 
+        strncpy(utf8str, "\xF0\x9F\x98\xA0", 4); 
     }
 }
 // Modify the UTF-8 string `utf8str` to invert ALL of the character by calling your
