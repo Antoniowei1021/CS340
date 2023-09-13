@@ -39,18 +39,18 @@ char *emoji_random_alloc() {
 // in the string if it the first character is an emoji.  At a minimum:
 // - Invert "😊" U+1F60A ("\xF0\x9F\x98\x8A") into ANY non-smiling face.
 // - Choose at least five more emoji to invert.
-void emoji_invertChar(unsigned char *str) {
-    if (strncmp(str, "\xF0\x9F\x98\x8A", 4) == 0) { 
-        strncpy(str, "\xF0\x9F\x98\x9E", 4); 
-    } else if (strncmp(str, "\xF0\x9F\x98\x81", 4) == 0) { 
-        strncpy(str, "\xF0\x9F\x98\x94", 4); 
-    } else if (strncmp(str, "\xF0\x9F\x98\x82", 4) == 0) { 
-        strncpy(str, "\xF0\x9F\x98\xA9", 4); 
-    } else if (strncmp(str, "\xF0\x9F\x91\x8D", 4) == 0) { 
-        strncpy(str, "\xF0\x9F\x91\x8E", 4); 
-    } else if (strncmp(str, "\xF0\x9F\x92\xA9", 4) == 0) {
-        strncpy(str, "\xF0\x9F\x8E\x80", 4); 
-    } else if (strncmp(str, "\xF0\x9F\x98\x8D", 4) == 0) { 
+void emoji_invertChar(unsigned char *utf8str) {
+    if (strncmp(utf8str, "\xF0\x9F\x98\x8A", 4) == 0) { 
+        strncpy(utf8str, "\xF0\x9F\x98\x9E", 4); 
+    } else if (strncmp(utf8str, "\xF0\x9F\x98\x81", 4) == 0) { 
+        strncpy(utf8str, "\xF0\x9F\x98\x94", 4); 
+    } else if (strncmp(utf8str, "\xF0\x9F\x98\x82", 4) == 0) { 
+        strncpy(utf8str, "\xF0\x9F\x98\xA9", 4); 
+    } else if (strncmp(utf8str, "\xF0\x9F\x91\x8D", 4) == 0) { 
+        strncpy(utf8str, "\xF0\x9F\x91\x8E", 4); 
+    } else if (strncmp(utf8str, "\xF0\x9F\x92\xA9", 4) == 0) {
+        strncpy(utf8str, "\xF0\x9F\x8E\x80", 4); 
+    } else if (strncmp(utf8str, "\xF0\x9F\x98\x8D", 4) == 0) { 
         strncpy(str, "\xF0\x9F\x98\xA0", 4); 
     }
 }
