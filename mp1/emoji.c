@@ -54,8 +54,6 @@ void emoji_invertChar(unsigned char *str) {
         strncpy(str, "\xF0\x9F\x98\xA0", 4); 
     }
 }
-
-
 // Modify the UTF-8 string `utf8str` to invert ALL of the character by calling your
 // `emoji_invertChar` function on each character.
 void emoji_invertAll(unsigned char *utf8str) {
@@ -64,8 +62,6 @@ void emoji_invertAll(unsigned char *utf8str) {
         emoji_invertChar(utf8str + i);
     }
 }
-
-
 // Reads the full contents of the file `fileName, inverts all emojis, and
 // returns a newly allocated string with the inverted file's content.
 unsigned char *emoji_invertFile_alloc(const char *fileName) {
@@ -73,20 +69,16 @@ unsigned char *emoji_invertFile_alloc(const char *fileName) {
     if (fp == NULL) {
         return NULL;
     }
-    // Get the file size
     fseek(fp, 0, SEEK_END);
     long fileSize = ftell(fp);
     fseek(fp, 0, SEEK_SET);
-    // Allocate memory for file content and null-terminator
     unsigned char *fileContent = (unsigned char *)calloc(fileSize + 1, sizeof(unsigned char));
     if (fileContent == NULL) {
         fclose(fp);
         return NULL;
     }
-    // Read file into memory
     fread(fileContent, 1, fileSize, fp);
     fileContent[fileSize] = '\0';
-    // Close the file
     fclose(fp);
     emoji_invertAll(fileContent);
     return fileContent;

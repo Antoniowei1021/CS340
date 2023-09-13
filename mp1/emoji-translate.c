@@ -18,15 +18,10 @@ void emoji_add_translation(emoji_t *emoji, const unsigned char *source, const un
             return;
         }
     }
-    if (emoji->size >= emoji->capacity) {
-        emoji->capacity *= 2;
-        emoji->rules = (EmojiRules *)realloc(emoji->rules, emoji->capacity * sizeof(EmojiRules));
-    }
     emoji->rules[emoji->size].source = (unsigned char *)strdup((char *)source);
     emoji->rules[emoji->size].translation = (unsigned char *)strdup((char *)translation);
     emoji->size++;
 } 
-
 // Translates the emojis contained in the file `fileName`.
 const unsigned char *emoji_translate_file_alloc(emoji_t *emoji, const char *fileName) {
   FILE *file = fopen(fileName, "r");
