@@ -38,10 +38,13 @@ if (strcmp(mode, "r") == 0 || strcmp(mode, "r+") == 0) {
       return NULL;
       }
     png->status = strdup(mode);
+    free(png->status);
 } else if (strcmp(mode, "w") == 0) {
   fwrite(signature, 1, sizeof(signature), fp);
   png->status = strdup(mode);
+    free(png->status);
 }
+    free(fileContent);
     return png;
 }
 /**
@@ -72,6 +75,7 @@ size_t PNG_read(PNG *png, PNG_Chunk *chunk) {
   uint32_t length1;
   fread(&length1, 1, 4, png->file);
   chunk->crc = ntohl(length1);
+  free(chunk->data);
   return chunk->len + 12;
 }
 
@@ -98,14 +102,14 @@ size_t bytesWritten = 0;
     bytesWritten += chunk->len;
     //CRC
     u_int32_t chunk_crc = 0;
-    unsigned char *temp_buffer = malloc(4 + chunk->len);
+    unsigned char *temp_buffer = calloc(4 + chunk->len, sizeof(unsigned char));
     memcpy(temp_buffer, chunk->type, 4);
     memcpy(temp_buffer + 4, chunk->data, chunk->len);
     crc32(temp_buffer,4 + chunk->len ,&chunk_crc);
     uint32_t crcNetworkOrder = htonl(chunk_crc);
     fwrite(&crcNetworkOrder, sizeof(uint32_t), 1, png->file);
     bytesWritten += sizeof(uint32_t);
-
+    free(temp_buffer);
     return bytesWritten;
 }
   

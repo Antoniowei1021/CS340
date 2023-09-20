@@ -18,12 +18,11 @@ int png_hideGIF(const char *png_filename_source, const char *gif_filename, const
             return ERROR_INVALID_CHUNK_DATA;
         }
         PNG_write(out, &chunk);
-        printf("PNG chunk %s written\n", chunk.type);
         if (!custom_chunk_written && strcmp(chunk.type, "IHDR") == 0) {
             fseek(gif_file, 0, SEEK_END);
             size_t gif_size = ftell(gif_file);
             rewind(gif_file);
-            unsigned char *gif_data = malloc(gif_size);
+            unsigned char *gif_data = calloc(gif_size, sizeof(unsigned char));
             fread(gif_data, 1, gif_size, gif_file);
             // Create a 'uiuc' chunk
             PNG_Chunk uiuc_chunk;
@@ -32,7 +31,6 @@ int png_hideGIF(const char *png_filename_source, const char *gif_filename, const
             uiuc_chunk.data = gif_data;
             // Write the 'uiuc' chunk
             PNG_write(out, &uiuc_chunk);
-            printf("Custom PNG chunk 'uiuc' written with GIF data\n");
             free(gif_data);
             custom_chunk_written = 1;
         }
