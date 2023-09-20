@@ -8,12 +8,9 @@ int png_rewrite(const char *png_filename_in, const char *png_filename_out) {
   // Open the file specified in argv[1] for reading and argv[2] for writing:
   PNG *png = PNG_open(png_filename_in, "r");
   if (!png) { return ERROR_INVALID_FILE; }
-
   PNG *out = PNG_open(png_filename_out, "w");
   printf("PNG Header written.\n");
   size_t bytesWritten;
-
-
   // Read chunks until reaching "IEND" or in invalid chunk:
   while (1) {
     // Read chunk and ensure we get a valid result (exit on error):
@@ -23,7 +20,6 @@ int png_rewrite(const char *png_filename_in, const char *png_filename_out) {
       PNG_close(out);
       return ERROR_INVALID_CHUNK_DATA;
     }
-
     // Report data about the chunk to the command line:
     bytesWritten = PNG_write(out, &chunk);
     printf("PNG chunk %s written (%lu bytes)\n", chunk.type, bytesWritten);
@@ -32,8 +28,9 @@ int png_rewrite(const char *png_filename_in, const char *png_filename_out) {
     if ( strcmp(chunk.type, "IEND") == 0 ) {
       PNG_free_chunk(&chunk);
       break;  
+    } else {
+      fwrite(chunk.data, 1, chunk.len,chunk.type);
     }
-
     // Free the memory associated with the chunk we just read:
     PNG_free_chunk(&chunk);
   }

@@ -24,10 +24,26 @@ const int ERROR_NO_UIUC_CHUNK = 4;
  * with further fuctions in this library.
  */
 PNG * PNG_open(const char *filename, const char *mode) {
-  return NULL;
+  char  signature[8] = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
+  PNG *png = malloc(sizeof(PNG));
+  FILE *fp = fopen(filename, mode);
+    if (fp == NULL) {
+        return NULL;
+    }      
+png->file = fp;
+char *fileContent = (char *)calloc(9, sizeof(char));
+fread(fileContent, 1, 8, (FILE*)fp);
+if (strcmp(mode, "r") == 0 || strcmp(mode, "r+") == 0) {
+    if (strncmp(fileContent,signature, 8) != 0) {
+      return NULL;
+      }
+    png->status = strdup(mode);
+} else if (strcmp(mode, "w") == 0) {
+  fwrite(signature, 1, sizeof(signature), fp);
+  png->status = strdup(mode);
 }
-
-
+    return png;
+}
 /**
  * Reads the next PNG chunk from `png`.
  * 
@@ -39,7 +55,24 @@ PNG * PNG_open(const char *filename, const char *mode) {
  * Users of the library must call `PNG_free_chunk` on all returned chunks.
  */
 size_t PNG_read(PNG *png, PNG_Chunk *chunk) {
-  return 0;
+  if (png->file == NULL || chunk == NULL) {
+    return 0;
+  }
+  //len
+  uint32_t length;
+  fread(&length, 1, 4, png->file);
+  chunk->len = ntohl(length);
+  //type
+ fread(chunk->type, 1, 4, png->file);
+  chunk->type[4] = '\0';
+  //data
+   chunk->data = malloc(chunk->len);
+    fread(chunk->data, 1, chunk->len, png->file);
+  //crc
+  uint32_t length1;
+  fread(&length1, 1, 4, png->file);
+  chunk->crc = ntohl(length1);
+  return chunk->len + 12;
 }
 
 
@@ -49,15 +82,50 @@ size_t PNG_read(PNG *png, PNG_Chunk *chunk) {
  * Returns the number of bytes written. 
  */
 size_t PNG_write(PNG *png, PNG_Chunk *chunk) {
-  return 0;
+   if (png->file == NULL || chunk == NULL) {
+    return 0;
+  }
+size_t bytesWritten = 0;
+    //len
+    uint32_t lengthNetworkOrder = htonl(chunk->len);
+    fwrite(&lengthNetworkOrder, sizeof(uint32_t), 1, png->file);
+    bytesWritten += sizeof(uint32_t);
+    //type
+    fwrite(chunk->type, sizeof(char), 4, png->file);
+    bytesWritten += 4;
+    //data
+    fwrite(chunk->data, sizeof(unsigned char), chunk->len, png->file);
+    bytesWritten += chunk->len;
+    //CRC
+    u_int32_t chunk_crc = 0;
+    unsigned char *temp_buffer = malloc(4 + chunk->len);
+    memcpy(temp_buffer, chunk->type, 4);
+    memcpy(temp_buffer + 4, chunk->data, chunk->len);
+    crc32(temp_buffer,4 + chunk->len ,&chunk_crc);
+    uint32_t crcNetworkOrder = htonl(chunk_crc);
+    fwrite(&crcNetworkOrder, sizeof(uint32_t), 1, png->file);
+    bytesWritten += sizeof(uint32_t);
+
+    return bytesWritten;
 }
+  
+
 
 
 /**
  * Frees all memory allocated by this library related to `chunk`.
  */
 void PNG_free_chunk(PNG_Chunk *chunk) {
-
+  if (chunk) {
+    if (chunk->data) {
+      free(chunk->data);
+    }
+    chunk->crc = 0;
+  chunk->len = 0;
+  for (int i = 0; i < 4; i++) {
+    chunk->type[i] = '\0';
+  }
+  }
 }
 
 
@@ -65,5 +133,11 @@ void PNG_free_chunk(PNG_Chunk *chunk) {
  * Closes the PNG file and frees all memory related to `png`.
  */
 void PNG_close(PNG *png) {
-
+  if (png) {
+    if (png->file) {
+        fclose(png->file);
+    }
+    png->status = 0;
+    free(png);
+  }
 }

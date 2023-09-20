@@ -13,9 +13,12 @@ TEST_CASE("png_extractGIF - GIF extracted with correct file size (waf)", "[weigh
   REQUIRE(result == 0);
 
   FILE *f = fopen("TEST.gif", "r");
+
   fseek(f, 0, SEEK_END);
   int length = ftell(f);
+    printf("%d", length);
   REQUIRE(length == 3044143);
+
 
   fclose(f);
 

@@ -1,5 +1,7 @@
 #pragma once
 #include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -8,9 +10,11 @@ extern "C" {
 // PNG
 struct _PNG {
   // Add any elements you need to store the PNG here:
+  char * status;
+  FILE * file;
 };
 typedef struct _PNG PNG;
-
+  
 
 // ===
 // === Note: Do not edit anything below this line.  This part of the library is fixed
