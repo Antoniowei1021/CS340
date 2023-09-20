@@ -106,7 +106,7 @@ size_t bytesWritten = 0;
     bytesWritten += chunk->len;
     //CRC
     u_int32_t chunk_crc = 0;
-    unsigned char *temp_buffer = malloc(4 + chunk->len);
+    unsigned char *temp_buffer = calloc(4 + chunk->len, sizeof(unsigned char));
     memcpy(temp_buffer, chunk->type, 4);
     memcpy(temp_buffer + 4, chunk->data, chunk->len);
     crc32(temp_buffer,4 + chunk->len ,&chunk_crc);
@@ -125,7 +125,9 @@ size_t bytesWritten = 0;
  */
 void PNG_free_chunk(PNG_Chunk *chunk) {
   if (chunk) {
-    
+    if (chunk->data) {
+      free(chunk->data);
+    }
     chunk->crc = 0;
   chunk->len = 0;
   for (int i = 0; i < 4; i++) {
