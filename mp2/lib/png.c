@@ -28,7 +28,6 @@ PNG * PNG_open(const char *filename, const char *mode) {
   PNG *png = malloc(sizeof(PNG));
   FILE *fp = fopen(filename, mode);
   if (fp == NULL) {
-    free(png);
     return NULL;
   }      
   png->file = fp;
@@ -39,8 +38,6 @@ PNG * PNG_open(const char *filename, const char *mode) {
 
   if (strcmp(mode, "r") == 0 || strcmp(mode, "r+") == 0) {
     if (strncmp(fileContent, signature, 8) != 0) {
-      fclose(fp);
-      free(png);
       return NULL;
     }
     png->status = strdup(mode);
@@ -75,7 +72,6 @@ size_t PNG_read(PNG *png, PNG_Chunk *chunk) {
   //data
    chunk->data = malloc(chunk->len);
     fread(chunk->data, 1, chunk->len, png->file);
-    free(chunk->data);
   //crc
   uint32_t length1;
   fread(&length1, 1, 4, png->file);
@@ -106,7 +102,7 @@ size_t bytesWritten = 0;
     bytesWritten += chunk->len;
     //CRC
     u_int32_t chunk_crc = 0;
-    unsigned char *temp_buffer = calloc(4 + chunk->len, sizeof(unsigned char));
+    unsigned char *temp_buffer = malloc(4 + chunk->len);
     memcpy(temp_buffer, chunk->type, 4);
     memcpy(temp_buffer + 4, chunk->data, chunk->len);
     crc32(temp_buffer,4 + chunk->len ,&chunk_crc);
@@ -125,6 +121,7 @@ size_t bytesWritten = 0;
  */
 void PNG_free_chunk(PNG_Chunk *chunk) {
   if (chunk) {
+
     chunk->crc = 0;
   chunk->len = 0;
   for (int i = 0; i < 4; i++) {
