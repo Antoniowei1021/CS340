@@ -24,28 +24,32 @@ const int ERROR_NO_UIUC_CHUNK = 4;
  * with further fuctions in this library.
  */
 PNG * PNG_open(const char *filename, const char *mode) {
-  char  signature[8] = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
+    char  signature[8] = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
   PNG *png = malloc(sizeof(PNG));
   FILE *fp = fopen(filename, mode);
-    if (fp == NULL) {
-        return NULL;
-    }      
-png->file = fp;
-char *fileContent = (char *)calloc(9, sizeof(char));
-fread(fileContent, 1, 8, (FILE*)fp);
-if (strcmp(mode, "r") == 0 || strcmp(mode, "r+") == 0) {
-    if (strncmp(fileContent,signature, 8) != 0) {
+  if (fp == NULL) {
+    free(png);
+    return NULL;
+  }      
+  png->file = fp;
+
+  char fileContent[9];
+  fread(fileContent, 1, 8, fp);
+  fileContent[8] = '\0';
+
+  if (strcmp(mode, "r") == 0 || strcmp(mode, "r+") == 0) {
+    if (strncmp(fileContent, signature, 8) != 0) {
+      fclose(fp);
+      free(png);
       return NULL;
-      }
+    }
     png->status = strdup(mode);
-    free(png->status);
-} else if (strcmp(mode, "w") == 0) {
-  fwrite(signature, 1, sizeof(signature), fp);
-  png->status = strdup(mode);
-    free(png->status);
-}
-    free(fileContent);
-    return png;
+  } else if (strcmp(mode, "w") == 0) {
+    fwrite(signature, 1, sizeof(signature), fp);
+    png->status = strdup(mode);
+  }
+
+  return png;
 }
 /**
  * Reads the next PNG chunk from `png`.
@@ -71,11 +75,11 @@ size_t PNG_read(PNG *png, PNG_Chunk *chunk) {
   //data
    chunk->data = malloc(chunk->len);
     fread(chunk->data, 1, chunk->len, png->file);
+    free(chunk->data);
   //crc
   uint32_t length1;
   fread(&length1, 1, 4, png->file);
   chunk->crc = ntohl(length1);
-  free(chunk->data);
   return chunk->len + 12;
 }
 
@@ -137,11 +141,13 @@ void PNG_free_chunk(PNG_Chunk *chunk) {
  * Closes the PNG file and frees all memory related to `png`.
  */
 void PNG_close(PNG *png) {
-  if (png) {
-    if (png->file) {
-        fclose(png->file);
+ if (png) {
+        if (png->file) {
+            fclose(png->file);
+        }
+        if (png->status) {
+            free(png->status);
+        }
+        free(png);
     }
-    png->status = 0;
-    free(png);
-  }
 }
