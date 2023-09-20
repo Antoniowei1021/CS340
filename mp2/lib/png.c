@@ -125,9 +125,6 @@ size_t bytesWritten = 0;
  */
 void PNG_free_chunk(PNG_Chunk *chunk) {
   if (chunk) {
-    if (chunk->data) {
-      free(chunk->data);
-    }
     chunk->crc = 0;
   chunk->len = 0;
   for (int i = 0; i < 4; i++) {
