@@ -75,35 +75,39 @@ void *calloc(size_t num, size_t size) {
  */
 void *malloc(size_t size) {
     if(!start) {start = sbrk(0);}
+        if (!head) {
+            metadata_t* rd = sbrk(sizeof(metadata_t));
+            rd->size = size;
+            rd->status = 1;
+            void * ptr = sbrk(size);
+            return ptr;
+        } 
     metadata_t * it = head;
-    metadata_t * prev = NULL;
-    while (it) {
-        if(it->size >= size + sizeof(metadata_t)) {
-            int remaining_size = it->size - size - sizeof(metadata_t);
-            if(remaining_size > 0) {
-                it->size = size;
-                it->status = 1;
-                metadata_t* new_block = (char*)it + sizeof(metadata_t) + size;
-                new_block->status = 0; 
-                new_block->size = remaining_size;
-                new_block->next = it->next;
-                it->next = new_block;
-            }
-            if(prev) {
-                prev->next = it->next;
-            } else {
-                head = it->next; 
-            }
-            return (char*)it + sizeof(metadata_t); 
+    metadata_t * prev = head;
+    while (it) { 
+        if(it->size > size + sizeof(metadata_t)) {
+            //split the block starts here
+        int block_size = it->size;
+        metadata_t* new_data = (char*)it + size + sizeof(metadata_t);
+        new_data->size = block_size - size - sizeof(metadata_t);
+        new_data->status = 0;
+        new_data->next = it->next;
+        it->status = 1;
+        it->size = size;
+        if(prev == it) {
+            head = new_data; 
+        } else {
+            prev->next = new_data; 
         }
+        return (char*)it + sizeof(metadata_t);
+        } 
         prev = it;
         it = it->next;
     }
     metadata_t* new_data = sbrk(sizeof(metadata_t));
     new_data->size = size;
     new_data->status = 1;
-    new_data->next = NULL;  // It's not part of the free list yet
-    void* result = sbrk(size);
+    void * result = sbrk(size);
     return result;
 }
 
@@ -127,33 +131,33 @@ void free(void* ptr) {
     if (!ptr) {
     return; 
     }
-    metadata_t* block_to_free = ptr - sizeof(metadata_t);
-    block_to_free->status = 0;
+    metadata_t* rand = ptr - sizeof(metadata_t);
+    rand->status = 0;
     if (!head) {
-        head = block_to_free;
-        block_to_free->next = NULL;
+        head = rand;
+        rand->next = NULL;
         return;
     }
     metadata_t *current = head;
     metadata_t *prev = NULL;
-    while (current && (block_to_free > current)) {
+    while (current && (rand > current)) {
         prev = current;
         current = current->next;
     }
     if (prev) {
-        prev->next = block_to_free;
+        prev->next = rand;
     } else {
-        head = block_to_free; 
+        head = rand; 
     }
-    block_to_free->next = current;
-    metadata_t* next_block = ((char*)block_to_free + sizeof(metadata_t) + block_to_free->size);
-    if (block_to_free->next == next_block && next_block->status == 0) {
-        block_to_free->size += next_block->size + sizeof(metadata_t);
-        block_to_free->next = next_block->next;
+    rand->next = current;
+    metadata_t* next_block = ((char*)rand + sizeof(metadata_t) + rand->size);
+    if (rand->next == next_block && next_block->status == 0) {
+        rand->size += next_block->size + sizeof(metadata_t);
+        rand->next = next_block->next;
     }
     if (prev && prev->status == 0) {
-        prev->size += block_to_free->size + sizeof(metadata_t);
-        prev->next = block_to_free->next;
+        prev->size += rand->size + sizeof(metadata_t);
+        prev->next = rand->next;
     }
 }
 
