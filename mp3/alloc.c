@@ -6,7 +6,16 @@
 #include <string.h>
 #include <unistd.h>
 
+typedef struct metadata_t {
+  // Add any elements you need to store the PNG here:
+  int status;
+  int size;
+  void* next;
 
+}metadata_t;
+
+void* start = NULL;
+metadata_t* head = NULL;
 
 /**
  * Allocate space for array in memory
@@ -31,9 +40,15 @@
  *
  * @see http://www.cplusplus.com/reference/clibrary/cstdlib/calloc/
  */
-void *calloc(size_t num, size_t size) {
-  // implement calloc:
-  return NULL;
+void *calloc(size_t num, size_t size) { 
+    size_t total_size = num * size;
+    void* ptr = malloc(total_size);
+    if (!ptr) {  
+        return NULL;
+    }
+    // Initialize memory to 0
+    memset(ptr, 0, total_size);
+    return ptr;
 }
 
 
@@ -59,10 +74,38 @@ void *calloc(size_t num, size_t size) {
  * @see http://www.cplusplus.com/reference/clibrary/cstdlib/malloc/
  */
 void *malloc(size_t size) {
-  // implement malloc:
-  return NULL;
+    if(!start) {start = sbrk(0);}
+    metadata_t * it = head;
+    metadata_t * prev = NULL;
+    while (it) {
+        if(it->size >= size + sizeof(metadata_t)) {
+            int remaining_size = it->size - size - sizeof(metadata_t);
+            if(remaining_size > 0) {
+                it->size = size;
+                it->status = 1;
+                metadata_t* new_block = (char*)it + sizeof(metadata_t) + size;
+                new_block->status = 0; 
+                new_block->size = remaining_size;
+                new_block->next = it->next;
+                it->next = new_block;
+            }
+            if(prev) {
+                prev->next = it->next;
+            } else {
+                head = it->next; 
+            }
+            return (char*)it + sizeof(metadata_t); 
+        }
+        prev = it;
+        it = it->next;
+    }
+    metadata_t* new_data = sbrk(sizeof(metadata_t));
+    new_data->size = size;
+    new_data->status = 1;
+    new_data->next = NULL;  // It's not part of the free list yet
+    void* result = sbrk(size);
+    return result;
 }
-
 
 /**
  * Deallocate space in memory
@@ -80,9 +123,40 @@ void *malloc(size_t size) {
  *    calloc() or realloc() to be deallocated.  If a null pointer is
  *    passed as argument, no action occurs.
  */
-void free(void *ptr) {
-  // implement free
+void free(void* ptr) {
+    if (!ptr) {
+    return; 
+    }
+    metadata_t* block_to_free = ptr - sizeof(metadata_t);
+    block_to_free->status = 0;
+    if (!head) {
+        head = block_to_free;
+        block_to_free->next = NULL;
+        return;
+    }
+    metadata_t *current = head;
+    metadata_t *prev = NULL;
+    while (current && (block_to_free > current)) {
+        prev = current;
+        current = current->next;
+    }
+    if (prev) {
+        prev->next = block_to_free;
+    } else {
+        head = block_to_free; 
+    }
+    block_to_free->next = current;
+    metadata_t* next_block = ((char*)block_to_free + sizeof(metadata_t) + block_to_free->size);
+    if (block_to_free->next == next_block && next_block->status == 0) {
+        block_to_free->size += next_block->size + sizeof(metadata_t);
+        block_to_free->next = next_block->next;
+    }
+    if (prev && prev->status == 0) {
+        prev->size += block_to_free->size + sizeof(metadata_t);
+        prev->next = block_to_free->next;
+    }
 }
+
 
 
 /**
@@ -131,6 +205,24 @@ void free(void *ptr) {
  * @see http://www.cplusplus.com/reference/clibrary/cstdlib/realloc/
  */
 void *realloc(void *ptr, size_t size) {
-  // implement realloc:
-  return NULL;
+  if (!ptr) {
+        return malloc(size);
+  }
+  if (size == 0) {
+        free(ptr);
+        return NULL;
+  }
+  metadata_t* location = ptr - sizeof(metadata_t);
+  if (location->size > size) {
+        location->size = size;
+        return ptr;
+  } else if (location->size < size) {
+        void* new_ptr = malloc(size);
+        memcpy(new_ptr, ptr, size);
+        free(ptr);
+        return new_ptr;
+  } else {
+        return ptr;
+  }
+    return NULL;
 }

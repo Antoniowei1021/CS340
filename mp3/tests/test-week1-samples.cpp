@@ -92,7 +92,7 @@ TEST_CASE("01-tutorial - including blocking spliting", "[weight=25][part=2]") {
   system("rm mstats_result.txt");
 }
 
-// MEMORY COALESCING - 25 points
+//MEMORY COALESCING - 25 points
 TEST_CASE("08-coalescing - Basic Coalescing", "[weight=10][part=3]") {
   system("make -s");
   system("./mstats tests/samples_exe/08-coalescing evaluate");

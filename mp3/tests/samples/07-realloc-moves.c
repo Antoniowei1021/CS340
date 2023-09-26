@@ -10,7 +10,6 @@ int main() {
   char *e = malloc(0x10000);
 
   strcpy(c, TEST_STRING);
-
   char *c2 = realloc(c, 0x10000);
 
   if (strcmp(c2, TEST_STRING) != 0) {

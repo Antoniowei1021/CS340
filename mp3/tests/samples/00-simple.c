@@ -8,7 +8,6 @@ int main() {
   for (i = 0; i < TEST_SIZE; i++) {
     *buffer = 'a';
   }
-
   free(buffer);
   return 0;
 }
