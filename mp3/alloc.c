@@ -75,20 +75,20 @@ void *calloc(size_t num, size_t size) {
  */
 void *malloc(size_t size) {
     if(!start) {start = sbrk(0);}
-        if (!head) {
-            metadata_t* rd = sbrk(sizeof(metadata_t));
-            rd->size = size;
-            rd->status = 1;
-            void * ptr = sbrk(size);
-            return ptr;
-        } 
+    if (!head) {
+        metadata_t* rd = sbrk(sizeof(metadata_t));
+        rd->size = size;
+        rd->status = 1;
+        void * ptr = sbrk(size);
+        return ptr;
+    } 
     metadata_t * it = head;
     metadata_t * prev = head;
     while (it) { 
         if(it->size > size + sizeof(metadata_t)) {
             //split the block starts here
         int block_size = it->size;
-        metadata_t* new_data = (char*)it + size + sizeof(metadata_t);
+        metadata_t* new_data = (void*)it + size + sizeof(metadata_t) ;
         new_data->size = block_size - size - sizeof(metadata_t);
         new_data->status = 0;
         new_data->next = it->next;
@@ -99,7 +99,7 @@ void *malloc(size_t size) {
         } else {
             prev->next = new_data; 
         }
-        return (char*)it + sizeof(metadata_t);
+            return (void*)it + sizeof(metadata_t);
         } 
         prev = it;
         it = it->next;
@@ -128,9 +128,7 @@ void *malloc(size_t size) {
  *    passed as argument, no action occurs.
  */
 void free(void* ptr) {
-    if (!ptr) {
-    return; 
-    }
+    if (!ptr) return;
     metadata_t* rand = ptr - sizeof(metadata_t);
     rand->status = 0;
     if (!head) {
@@ -150,7 +148,7 @@ void free(void* ptr) {
         head = rand; 
     }
     rand->next = current;
-    metadata_t* next_block = ((char*)rand + sizeof(metadata_t) + rand->size);
+    metadata_t* next_block = rand + sizeof(metadata_t) + rand->size;
     if (rand->next == next_block && next_block->status == 0) {
         rand->size += next_block->size + sizeof(metadata_t);
         rand->next = next_block->next;
@@ -217,16 +215,25 @@ void *realloc(void *ptr, size_t size) {
         return NULL;
   }
   metadata_t* location = ptr - sizeof(metadata_t);
-  if (location->size > size) {
-        location->size = size;
-        return ptr;
-  } else if (location->size < size) {
-        void* new_ptr = malloc(size);
-        memcpy(new_ptr, ptr, size);
-        free(ptr);
-        return new_ptr;
-  } else {
-        return ptr;
-  }
-    return NULL;
+//   if (location->size > size) {
+//     free(ptr);
+//     void* new_ptr = malloc(size);
+//         memcpy(new_ptr, ptr, size);
+//         return new_ptr;
+//   } else if (location->size < size) {
+//         void* new_ptr = malloc(size);
+//         memcpy(new_ptr, ptr, location->size);
+//         free(ptr);
+//         return new_ptr;
+//   } else {
+//         return ptr;
+//   }
+    int min_size = location->size;
+    if (size < min_size) {
+        min_size = size;
+    }
+    free(ptr);
+    void *res = malloc(size);
+    memcpy(res, ptr, min_size);
+    return res;
 }
