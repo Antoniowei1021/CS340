@@ -229,11 +229,11 @@ void *realloc(void *ptr, size_t size) {
 //         return ptr;
 //   }
     int min_size = location->size;
-    if (size < min_size) {
-        min_size = size;
+    if (size <= min_size) {
+        return ptr;
     }
-    free(ptr);
     void *res = malloc(size);
     memcpy(res, ptr, min_size);
+    free(ptr);
     return res;
 }
