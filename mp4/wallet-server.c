@@ -29,7 +29,8 @@ int fd = *((int *)vptr_fd);
 
     // send response:
      if (strncmp(buffer, "GET ", 4) == 0) {
-      char *resource = buffer + 4; // Name of the resource after "GET "
+      char *resource = buffer + 4; 
+      buffer[len - 1] = '\0';
       int val = wallet_get(&wallet, resource);
       sprintf(buffer, "%d\n", val);
       send(fd, buffer, strlen(buffer), 0);
@@ -39,14 +40,11 @@ int fd = *((int *)vptr_fd);
       token = strtok(NULL, " ");
       int delta = atoi(token);
       int new_val = wallet_change_resource(&wallet, resource, delta);
-
+        sprintf(buffer, "%d\n", new_val);
+      send(fd, buffer, strlen(buffer), 0);
       if (new_val >= 0) {
         sprintf(buffer, "%d\n", new_val);
         send(fd, buffer, strlen(buffer), 0);
-      } else {
-        // If resource is negative, wait for another thread to add resources. 
-        // This will block the current client, which isn't ideal in a real-world setting but it matches the given requirement.
-        continue;
       }
     } else if (strncmp(buffer, "EXIT\n", 5) == 0) {
       close(fd);
