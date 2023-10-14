@@ -74,7 +74,7 @@ void *calloc(size_t num, size_t size) {
  * @see http://www.cplusplus.com/reference/clibrary/cstdlib/malloc/
  */
 void *malloc(size_t size) {
-    if(!start) {start = sbrk(0);}
+    if (!start) {start = sbrk(0);}
     if (!head) {
         metadata_t* rd = sbrk(sizeof(metadata_t));
         rd->size = size;
@@ -94,7 +94,7 @@ void *malloc(size_t size) {
         new_data->next = it->next;
         it->status = 1;
         it->size = size;
-        if(prev == it) {
+        if (prev == it) {
             head = new_data; 
         } else {
             prev->next = new_data; 
@@ -161,7 +161,7 @@ void free(void* ptr) {
 
 
 
-/**
+/*
  * Reallocate memory block
  *
  * The size of the memory block pointed to by the ptr parameter is changed
@@ -215,19 +215,6 @@ void *realloc(void *ptr, size_t size) {
         return NULL;
   }
   metadata_t* location = ptr - sizeof(metadata_t);
-//   if (location->size > size) {
-//     free(ptr);
-//     void* new_ptr = malloc(size);
-//         memcpy(new_ptr, ptr, size);
-//         return new_ptr;
-//   } else if (location->size < size) {
-//         void* new_ptr = malloc(size);
-//         memcpy(new_ptr, ptr, location->size);
-//         free(ptr);
-//         return new_ptr;
-//   } else {
-//         return ptr;
-//   }
     int min_size = location->size;
     if (size <= min_size) {
         return ptr;

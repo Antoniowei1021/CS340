@@ -24,7 +24,7 @@ const int ERROR_NO_UIUC_CHUNK = 4;
  * with further fuctions in this library.
  */
 PNG * PNG_open(const char *filename, const char *mode) {
-    char  signature[8] = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
+  char signature[8] = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
   PNG *png = malloc(sizeof(PNG));
   FILE *fp = fopen(filename, mode);
   if (fp == NULL) {
@@ -32,11 +32,9 @@ PNG * PNG_open(const char *filename, const char *mode) {
     return NULL;
   }      
   png->file = fp;
-
   char fileContent[9];
   fread(fileContent, 1, 8, fp);
   fileContent[8] = '\0';
-
   if (strcmp(mode, "r") == 0 || strcmp(mode, "r+") == 0) {
     if (strncmp(fileContent, signature, 8) != 0) {
       fclose(fp);
@@ -48,8 +46,8 @@ PNG * PNG_open(const char *filename, const char *mode) {
     fwrite(signature, 1, sizeof(signature), fp);
     png->status = strdup(mode);
   }
-
   return png;
+
 }
 /**
  * Reads the next PNG chunk from `png`.
@@ -75,7 +73,7 @@ size_t PNG_read(PNG *png, PNG_Chunk *chunk) {
   //data
    chunk->data = malloc(chunk->len);
     fread(chunk->data, 1, chunk->len, png->file);
-    free(chunk->data);
+    free(chunk->data);  ew2q1`
   //crc
   uint32_t length1;
   fread(&length1, 1, 4, png->file);

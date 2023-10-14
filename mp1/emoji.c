@@ -27,7 +27,7 @@ int emoji_count(const unsigned char *utf8str) {
 // Return a random emoji stored in new heap memory you have allocated.  Make sure what
 // you return is a valid C-string that contains only one random emoji.
 char *emoji_random_alloc() {
-  char * result = calloc(5, sizeof(char));
+  char * result = malloc(5);
     result[0] = 0xF0;
     result[1] = 0x9F;
     result[2] = 0x90 + (rand() % (0x9F - 0x90 + 1));
