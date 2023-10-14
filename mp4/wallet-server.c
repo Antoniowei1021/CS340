@@ -26,6 +26,7 @@ int fd = *((int *)vptr_fd);
       continue;
     }
     buffer[len] = '\0';
+
     // send response:
      if (strncmp(buffer, "GET ", 4) == 0) {
       char *resource = buffer + 4; // Name of the resource after "GET "
@@ -38,16 +39,27 @@ int fd = *((int *)vptr_fd);
       token = strtok(NULL, " ");
       int delta = atoi(token);
       int new_val = wallet_change_resource(&wallet, resource, delta);
-      sprintf(buffer, "%d\n", new_val);
-      send(fd, buffer, strlen(buffer), 0);
+
+      if (new_val >= 0) {
+        sprintf(buffer, "%d\n", new_val);
+        send(fd, buffer, strlen(buffer), 0);
+      } else {
+        // If resource is negative, wait for another thread to add resources. 
+        // This will block the current client, which isn't ideal in a real-world setting but it matches the given requirement.
+        pthread_cond_wait(&wallet.condition, &wallet.mutex);
+        continue;
+      }
     } else if (strncmp(buffer, "EXIT\n", 5) == 0) {
       close(fd);
+      free(vptr_fd);
+      pthread_exit(NULL);
     } else {
       sprintf(buffer, "Unknown command\n");
       send(fd, buffer, strlen(buffer), 0);
     }
     send(fd, buffer, strlen(buffer), 0);
   }
+
   return NULL;
 }
 
