@@ -30,7 +30,7 @@ int fd = *((int *)vptr_fd);
     // send response:
      if (strncmp(buffer, "GET ", 4) == 0) {
       char *resource = buffer + 4; 
-      buffer[len - 1] = '\0';
+      buffer[len - 1] = NULL;
       int val = wallet_get(&wallet, resource);
       sprintf(buffer, "%d\n", val);
       send(fd, buffer, strlen(buffer), 0);
