@@ -18,59 +18,46 @@ void *client_communication_thread(void *vptr_fd) {
     char buffer[4096];
 
     while (1) {
+        // recv message:
         ssize_t len = recv(fd, buffer, 4096, 0);
-        if (len <= 0) {
-            printf("[%d]: socket closed or error occurred\n", fd);
+        if (len == -1) {
             break;
-        }
-        
-        // Remove all carriage return characters
-        for (int i = 0, j = 0; i < len; i++) {
-            if (buffer[i] != '\r') {
-                buffer[j++] = buffer[i];
-            }
+        } else if (len == 0) { 
+            continue;
         }
         buffer[len] = '\0';
-        
-        // Handling GET command
-        if (strncmp(buffer, "GET", 3) == 0) {
-            char resource_name[256];
-            sscanf(buffer, "GET %s", resource_name);
-            int count = wallet_get(&wallet, resource_name); // Assuming wallet is globally defined
 
-            sprintf(buffer, "%d\n", count);
+        if (strncmp(buffer, "GET ", 4) == 0) {
+            char *resource = buffer + 4; 
+            buffer[len - 1] = '\0';
+            int val = wallet_get(&wallet, resource);
+            sprintf(buffer, "%d\n", val);
             send(fd, buffer, strlen(buffer), 0);
-
-        } 
-        // Handling MOD command
-        else if (strncmp(buffer, "MOD", 3) == 0) {
-            char resource_name[256];
-            int delta;
-            sscanf(buffer, "MOD %s %d", resource_name, &delta);
-
-            // Trying to modify the resource and if resource goes negative, block until it's positive again.
-            pthread_mutex_lock(&(wallet.mutex));
-            while (wallet_change_resource(&wallet, resource_name, delta) < 0) {
-                pthread_cond_wait(&(wallet.condition), &(wallet.mutex));
+        } else if (strncmp(buffer, "MOD ", 4) == 0) {
+            char *token = strtok(buffer + 4, " "); // Split by space
+            char *resource = token;
+            token = strtok(NULL, " ");
+            int delta = atoi(token);
+            int new_val = wallet_change_resource(&wallet, resource, delta);
+            
+            // Block and wait until resource is positive
+            while (new_val < 0) {
+                pthread_cond_wait(&wallet.condition, &wallet.mutex);
+                new_val = wallet_get(&wallet, resource);
             }
-            int count = wallet_get(&wallet, resource_name);
-            pthread_mutex_unlock(&(wallet.mutex));
 
-            sprintf(buffer, "%d\n", count);
+            sprintf(buffer, "%d\n", new_val);
             send(fd, buffer, strlen(buffer), 0);
-
-        } 
-        // Handling EXIT command
-        else if (strncmp(buffer, "EXIT", 4) == 0) {
-            break;
+        } else if (strncmp(buffer, "EXIT\n", 5) == 0) {
+            close(fd);
+        } else {
+            sprintf(buffer, "Unknown command\n");
+            send(fd, buffer, strlen(buffer), 0);
         }
     }
 
-    close(fd);
-    free(vptr_fd);
     return NULL;
 }
-
 
 
 void create_wallet_server(int port) {
