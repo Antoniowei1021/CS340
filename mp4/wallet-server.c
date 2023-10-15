@@ -39,8 +39,6 @@ void *client_communication_thread(void *vptr_fd) {
             token = strtok(NULL, " ");
             int delta = atoi(token);
             int new_val = wallet_change_resource(&wallet, resource, delta);
-            
-            // Block and wait until resource is positive
             while (new_val < 0) {
                 pthread_cond_wait(&wallet.condition, &wallet.mutex);
                 new_val = wallet_get(&wallet, resource);
