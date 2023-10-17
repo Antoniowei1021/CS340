@@ -39,7 +39,6 @@ int wallet_get(wallet_t *wallet, const char *resource) {
  * - Returns the amount of resources in the wallet AFTER the change has been applied.
  */
 int wallet_change_resource(wallet_t *wallet, const char *resource, int delta) {
-
     pthread_mutex_lock(&wallet->mutex); 
     resource_t *node = NULL;
     resource_t *current = wallet->head;
