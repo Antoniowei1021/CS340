@@ -163,102 +163,102 @@ TEST_CASE("httprequest_read - Payload Binary Payload", "[weight=4][part=2]") {
   free(req);
 }
 
-// TEST_CASE("httprequest_read - Arbitrary Small Binary Payload", "[weight=4][part=2]") {
-//   int Length = 1024;
-//   char* payload = malloc(Length);
-//   char* full_request_begin, *full_request;
-//   full_request_begin = malloc(1024);
-//   sprintf(full_request_begin, "GET / HTTP/1.1\r\nHello: World\r\nHost: 127.0.0.1\r\nContent-Length: %d\r\n\r\n", Length);
-//   full_request = malloc(strlen(full_request_begin) + Length + 1);
+TEST_CASE("httprequest_read - Arbitrary Small Binary Payload", "[weight=4][part=2]") {
+  int Length = 1024;
+  char* payload = (char*)malloc(Length);
+  char* full_request_begin, *full_request;
+  full_request_begin = (char*)malloc(1024);
+  sprintf(full_request_begin, "GET / HTTP/1.1\r\nHello: World\r\nHost: 127.0.0.1\r\nContent-Length: %d\r\n\r\n", Length);
+  full_request = (char*)malloc(strlen(full_request_begin) + Length + 1);
 
-//   // generate a random payload
-//   for (int i = 0; i < Length; i++) {
-//     payload[i] = rand() % 256;
-//   }
-//   // concatenate the payload and the full_request
-//   memcpy(full_request, full_request_begin, strlen(full_request_begin));
-//   memcpy(full_request + strlen(full_request_begin), payload, Length);
-//   full_request[(int)strlen(full_request_begin) + Length] = '\0';
+  // generate a random payload
+  for (int i = 0; i < Length; i++) {
+    payload[i] = rand() % 256;
+  }
+  // concatenate the payload and the full_request
+  memcpy(full_request, full_request_begin, strlen(full_request_begin));
+  memcpy(full_request + strlen(full_request_begin), payload, Length);
+  full_request[(int)strlen(full_request_begin) + Length] = '\0';
 
-//   HTTPRequest *req = _readpipe_vptr(
-//     full_request,
-//     strlen(full_request_begin) + Length
-//   );
+  HTTPRequest *req = _readpipe_vptr(
+    full_request,
+    strlen(full_request_begin) + Length
+  );
 
-//   REQUIRE( req->payload != NULL );
-//   CHECK( memcmp(req->payload, payload, Length) == 0 );
+  REQUIRE( req->payload != NULL );
+  CHECK( memcmp(req->payload, payload, Length) == 0 );
 
-//   free(payload);
-//   free(full_request_begin);
-//   free(full_request);
-//   httprequest_destroy(req);
-//   free(req);
-// }
+  free(payload);
+  free(full_request_begin);
+  free(full_request);
+  httprequest_destroy(req);
+  free(req);
+}
 
-// TEST_CASE("httprequest_read - Arbitrary Long Binary Payload", "[weight=4][part=2]") {
-//   int Length = 32 * 1024;
-//   char* payload = malloc(Length);
-//   char* full_request_begin, *full_request;
-//   full_request_begin = malloc(1024);
-//   sprintf(full_request_begin, "GET / HTTP/1.1\r\nHello: World\r\nHost: 127.0.0.1\r\nContent-Length: %d\r\n\r\n", Length);
-//   full_request = malloc(strlen(full_request_begin) + Length + 1);
+TEST_CASE("httprequest_read - Arbitrary Long Binary Payload", "[weight=4][part=2]") {
+  int Length = 32 * 1024;
+  char* payload = (char*)malloc(Length);
+  char* full_request_begin, *full_request;
+  full_request_begin = (char*)malloc(1024);
+  sprintf(full_request_begin, "GET / HTTP/1.1\r\nHello: World\r\nHost: 127.0.0.1\r\nContent-Length: %d\r\n\r\n", Length);
+  full_request = (char*)malloc(strlen(full_request_begin) + Length + 1);
 
-//   // generate a random payload
-//   for (int i = 0; i < Length; i++) {
-//     payload[i] = rand() % 256;
-//   }
-//   // concatenate the payload and the full_request
-//   memcpy(full_request, full_request_begin, strlen(full_request_begin));
-//   memcpy(full_request + strlen(full_request_begin), payload, Length);
-//   full_request[(int)strlen(full_request_begin) + Length] = '\0';
-//   HTTPRequest *req = _readpipe_vptr(
-//     full_request,
-//     strlen(full_request_begin) + Length
-//   );
-//   REQUIRE( req->payload != NULL );
-//   CHECK( memcmp(req->payload, payload, Length) == 0 );
-//   free(payload);
-//   free(full_request_begin);
-//   free(full_request);
-//   httprequest_destroy(req);
-//   free(req);
-// }
+  // generate a random payload
+  for (int i = 0; i < Length; i++) {
+    payload[i] = rand() % 256;
+  }
+  // concatenate the payload and the full_request
+  memcpy(full_request, full_request_begin, strlen(full_request_begin));
+  memcpy(full_request + strlen(full_request_begin), payload, Length);
+  full_request[(int)strlen(full_request_begin) + Length] = '\0';
+  HTTPRequest *req = _readpipe_vptr(
+    full_request,
+    strlen(full_request_begin) + Length
+  );
+  REQUIRE( req->payload != NULL );
+  CHECK( memcmp(req->payload, payload, Length) == 0 );
+  free(payload);
+  free(full_request_begin);
+  free(full_request);
+  httprequest_destroy(req);
+  free(req);
+}
 
-// TEST_CASE("httprequest_read - Binary Payload with HTTP Payload Delimiter", "[weight=5][part=2]") {
-//   int Length = 32 * 1024;
-//   char* payload = malloc(Length);
-//   char* full_request_begin, *full_request;
-//   full_request_begin = malloc(1024);
-//   sprintf(full_request_begin, "GET / HTTP/1.1\r\nHello: World\r\nHost: 127.0.0.1\r\nContent-Length: %d\r\n\r\n", Length);
-//   full_request = malloc(strlen(full_request_begin) + Length + 1);
+TEST_CASE("httprequest_read - Binary Payload with HTTP Payload Delimiter", "[weight=5][part=2]") {
+  int Length = 32 * 1024;
+  char* payload = (char*)malloc(Length);
+  char* full_request_begin, *full_request;
+  full_request_begin = (char*)malloc(1024);
+  sprintf(full_request_begin, "GET / HTTP/1.1\r\nHello: World\r\nHost: 127.0.0.1\r\nContent-Length: %d\r\n\r\n", Length);
+  full_request = (char*)malloc(strlen(full_request_begin) + Length + 1);
 
-//   generate a random payload
-//   for (int i = 0; i < Length; i++) {
-//     if (i == Length / 2) {
-//       payload[i++] = "\r";
-//       payload[i++] = "\n";
-//       payload[i++] = "\r";
-//       payload[i] = "\n";
-//       continue;
-//     }
-//     payload[i] = rand() % 256;
-//   }
-//   // concatenate the payload and the full_request
-//   memcpy(full_request, full_request_begin, strlen(full_request_begin));
-//   memcpy(full_request + strlen(full_request_begin), payload, Length);
-//   full_request[(int)strlen(full_request_begin) + Length] = '\0';
-//   HTTPRequest *req = _readpipe_vptr(
-//     full_request,
-//     strlen(full_request_begin) + Length
-//   );
-//   REQUIRE( req->payload != NULL );
-//   CHECK( memcmp(req->payload, payload, Length) == 0 );
-//   free(payload);
-//   free(full_request_begin);
-//   free(full_request);
-//   httprequest_destroy(req);
-//   free(req);
-// }
+  //generate a random payload
+  for (int i = 0; i < Length; i++) {
+    if (i == Length / 2) {
+      payload[i++] = '\r';
+      payload[i++] = '\n';
+      payload[i++] = '\r';
+      payload[i] = '\n';
+      continue;
+    }
+    payload[i] = rand() % 256;
+  }
+  // concatenate the payload and the full_request
+  memcpy(full_request, full_request_begin, strlen(full_request_begin));
+  memcpy(full_request + strlen(full_request_begin), payload, Length);
+  full_request[(int)strlen(full_request_begin) + Length] = '\0';
+  HTTPRequest *req = _readpipe_vptr(
+    full_request,
+    strlen(full_request_begin) + Length
+  );
+  REQUIRE( req->payload != NULL );
+  CHECK( memcmp(req->payload, payload, Length) == 0 );
+  free(payload);
+  free(full_request_begin);
+  free(full_request);
+  httprequest_destroy(req);
+  free(req);
+}
 
 void payload_test(long size) {
   // Allocate memory for the string
