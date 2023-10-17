@@ -11,9 +11,43 @@
  * 
  * Populate a `req` with the contents of `buffer`, returning the number of bytes used from `buf`.
  */
+#include <string.h>
 ssize_t httprequest_parse_headers(HTTPRequest *req, char *buffer, ssize_t buffer_len) {
-  return -1;
+    char *token = strtok(buffer, " ");
+    if (token) {
+        req->action = token;
+        token = strtok(NULL, " ");
+    }
+    if (token) {
+        req->path = token;
+        token = strtok(NULL, "\r\n"); 
+    }
+    if (token) {
+        req->version = token;
+    } else {
+        return -1; 
+    }
+    _Header **current = &(req->head); 
+    char *line = strtok(NULL, "\r\n"); 
+    while (line) {
+        _Header *header = malloc(sizeof(_Header));
+        if (!header) {
+            httprequest_destroy(req);
+            return -1;
+        }
+        header->key = strtok(line, ": ");
+        header->value = strtok(NULL, "\r\n");
+        if (!header->key || !header->value) {
+            free(header);
+            return -1;
+        }
+        *current = header;
+        current = &(header->next);
+        line = strtok(NULL, "\r\n");
+    }
+    return 0; // Success
 }
+
 
 
 /**
@@ -32,7 +66,7 @@ ssize_t httprequest_read(HTTPRequest *req, int sockfd) {
  * Returns the HTTP action verb for a given `req`.
  */
 const char *httprequest_get_action(HTTPRequest *req) {
-  return NULL;
+    return req->action;
 }
 
 
@@ -42,7 +76,14 @@ const char *httprequest_get_action(HTTPRequest *req) {
  * Returns the value of the HTTP header `key` for a given `req`.
  */
 const char *httprequest_get_header(HTTPRequest *req, const char *key) {
-  return NULL;
+    _Header* it = req->head;
+    while (it) {
+        if (strcmp(it->key, key)) {
+            return it->value;
+        }
+        it = it->next;
+    }
+    return NULL;
 }
 
 
@@ -52,7 +93,7 @@ const char *httprequest_get_header(HTTPRequest *req, const char *key) {
  * Returns the requested path for a given `req`.
  */
 const char *httprequest_get_path(HTTPRequest *req) {
-  return NULL;
+    return req->path;
 }
 
 
@@ -62,5 +103,18 @@ const char *httprequest_get_path(HTTPRequest *req) {
  * Destroys a `req`, freeing all associated memory.
  */
 void httprequest_destroy(HTTPRequest *req) {
+    if (!req) {
+        return; 
+    }
+    _Header *current = req->head;
+    while (current) {
+        _Header *next = current->next;
+        
+        free(current->key);  
+        free(current->value); 
+        free(current);       
 
+        current = next;      
+    }
+    free(req);
 }

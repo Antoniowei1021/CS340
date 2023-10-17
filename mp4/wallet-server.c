@@ -26,7 +26,6 @@ void *client_communication_thread(void *vptr_fd) {
             continue;
         }
         buffer[len] = '\0';
-
         if (strncmp(buffer, "GET ", 4) == 0) {
             char *resource = buffer + 4; 
             buffer[len - 1] = '\0';
@@ -43,7 +42,6 @@ void *client_communication_thread(void *vptr_fd) {
                 pthread_cond_wait(&wallet.condition, &wallet.mutex);
                 new_val = wallet_get(&wallet, resource);
             }
-
             sprintf(buffer, "%d\n", new_val);
             send(fd, buffer, strlen(buffer), 0);
         } else if (strncmp(buffer, "EXIT\n", 5) == 0) {

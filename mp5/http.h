@@ -5,14 +5,18 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+typedef struct _Header{
+    struct _Header* next;
+    char* key;
+    char* value;
+} _Header;
 
 struct _HTTPRequest {
   const char *action;
   const char *path;
   const char *version;
   const void *payload;
-
+  _Header* head;
   // You may want to add more to this struct (ex: to hold the headers).
   // ...however, you MUST keep the `action`, `path`, `version`, and `payload` members
   //    so our test cases can inspect the contents of them without making you write
