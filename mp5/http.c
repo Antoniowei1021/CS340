@@ -13,39 +13,7 @@
  */
 #include <string.h>
 ssize_t httprequest_parse_headers(HTTPRequest *req, char *buffer, ssize_t buffer_len) {
-    char *token = strtok(buffer, " ");
-    if (token) {
-        req->action = token;
-        token = strtok(NULL, " ");
-    }
-    if (token) {
-        req->path = token;
-        token = strtok(NULL, "\r\n"); 
-    }
-    if (token) {
-        req->version = token;
-    } else {
-        return -1; 
-    }
-    _Header **current = &(req->head); 
-    char *line = strtok(NULL, "\r\n"); 
-    while (line) {
-        _Header *header = malloc(sizeof(_Header));
-        if (!header) {
-            httprequest_destroy(req);
-            return -1;
-        }
-        header->key = strtok(line, ": ");
-        header->value = strtok(NULL, "\r\n");
-        if (!header->key || !header->value) {
-            free(header);
-            return -1;
-        }
-        *current = header;
-        current = &(header->next);
-        line = strtok(NULL, "\r\n");
-    }
-    return 0; // Success
+ return -1;
 }
 
 
