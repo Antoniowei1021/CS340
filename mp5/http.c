@@ -174,7 +174,7 @@ void httprequest_destroy(HTTPRequest *req) {
     free((void*)req->action);
     free((void*)req->path);
     free((void*)req->version);
-
+    free((void*)req->payload);
     _Header *current = req->head;
     while (current) {
         _Header *next = current->next;
