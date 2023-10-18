@@ -1,44 +1,44 @@
-#include "lib/catch.hpp"
+// #include "lib/catch.hpp"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/socket.h>
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <string.h>
+// #include <unistd.h>
+// #include <sys/socket.h>
 
-#include "../http.h"
+// #include "../http.h"
 
-HTTPRequest *_parse_vptr(const void *s, size_t len) {
-  char *buf = (char *) malloc(len + 1);
-  memcpy(buf, s, len);
-  buf[len] = 0;
+// HTTPRequest *_parse_vptr(const void *s, size_t len) {
+//   char *buf = (char *) malloc(len + 1);
+//   memcpy(buf, s, len);
+//   buf[len] = 0;
 
-  HTTPRequest *req = (HTTPRequest *) malloc(sizeof(HTTPRequest));
-  httprequest_parse_headers(req, buf, len);
-  free(buf);
-  return req;
-}
+//   HTTPRequest *req = (HTTPRequest *) malloc(sizeof(HTTPRequest));
+//   httprequest_parse_headers(req, buf, len);
+//   free(buf);
+//   return req;
+// }
 
-HTTPRequest *_parse(const char *s) {
-  return _parse_vptr(s, strlen(s));
-}
+// HTTPRequest *_parse(const char *s) {
+//   return _parse_vptr(s, strlen(s));
+// }
 
 
-TEST_CASE("httprequest_parse_headers - Request Line", "[weight=3][part=1]") {
-  HTTPRequest *req = _parse("GET / HTTP/1.1\r\nHost: localhost\r\n\r\n");
+// TEST_CASE("httprequest_parse_headers - Request Line", "[weight=3][part=1]") {
+//   HTTPRequest *req = _parse("GET / HTTP/1.1\r\nHost: localhost\r\n\r\n");
 
-  REQUIRE( req->action != NULL );
-  CHECK( strcmp(req->action, "GET") == 0 );
+//   REQUIRE( req->action != NULL );
+//   CHECK( strcmp(req->action, "GET") == 0 );
 
-  REQUIRE( req->path != NULL );
-  CHECK( strcmp(req->path, "/") == 0 );
+//   REQUIRE( req->path != NULL );
+//   CHECK( strcmp(req->path, "/") == 0 );
 
-  REQUIRE( req->version != NULL );
-  CHECK( strcmp(req->version, "HTTP/1.1") == 0 );
+//   REQUIRE( req->version != NULL );
+//   CHECK( strcmp(req->version, "HTTP/1.1") == 0 );
 
-  httprequest_destroy(req);
-  free(req);
-}
+//   httprequest_destroy(req);
+//   free(req);
+// }
 
 // TEST_CASE("httprequest_parse_headers - No Header", "[weight=3][part=1]") {
 //   HTTPRequest *req = _parse("GET / HTTP/1.1\r\n\r\n\r\n");

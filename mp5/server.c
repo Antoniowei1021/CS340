@@ -7,75 +7,48 @@
 #include <netinet/in.h>
 #include <pthread.h>
 #include <fcntl.h>
-void client_thread(int fd) {
-    // 1. Read the HTTP Request
+#include <unistd.h>
+
+
+void *client_thread(void *vptr) {
+    int fd = *((int *)vptr);
     HTTPRequest req;
+    
+    // 1. Parse the client's HTTP request
     if (httprequest_read(&req, fd) < 0) {
-        // Handle error
-        write(fd, "HTTP/1.1 400 Bad Request\r\n\r\n", 28);
         close(fd);
-        return;
+        return NULL;
     }
-
-    // 2. Process the Request Path
-    const char *path = req.path;
-    if (strcmp(path, "/") == 0) {
-        path = "/index.html";
+    char *file_path = req.path;
+    if (strcmp(file_path, "/") == 0) {
+        file_path = "/index.html";
     }
-
-    // Construct the full file path
-    char filepath[1024]; // or some max path length
-    snprintf(filepath, sizeof(filepath), "static%s", path);
-
-    // 3. Check if the Requested File Exists
-    if (access(filepath, F_OK) == -1) {
-        // Send 404 Not Found response
-        write(fd, "HTTP/1.1 404 Not Found\r\n\r\n", 27);
-        close(fd);
-        return;
-    }
-
-    // 4. Determine the Content-Type
-    char *content_type = "application/octet-stream"; // default
-    if (strstr(filepath, ".html")) {
-        content_type = "text/html";
-    } else if (strstr(filepath, ".png")) {
-        content_type = "image/png";
-    }
-
-    // 5. Construct and Send the HTTP Response
-
-    // Open file for reading
-    int file_fd = open(filepath, O_RDONLY);
-    if (file_fd == -1) {
-        write(fd, "HTTP/1.1 500 Internal Server Error\r\n\r\n", 37);
-        close(fd);
-        return;
-    }
-
+    char full_path[1024];
+    sprintf(full_path, "static%s", file_path);
     struct stat st;
-    fstat(file_fd, &st);
-    ssize_t file_size = st.st_size;
-
-    char response_header[1024];
-    int header_len = snprintf(response_header, sizeof(response_header),
-                              "HTTP/1.1 200 OK\r\n"
-                              "Content-Type: %s\r\n"
-                              "Content-Length: %zd\r\n\r\n",
-                              content_type, file_size);
-    write(fd, response_header, header_len);
-
-    // Transfer file contents
-    char buffer[1024];
-    ssize_t bytes_read;
-    while ((bytes_read = read(file_fd, buffer, sizeof(buffer))) > 0) {
-        write(fd, buffer, bytes_read);
+    if (stat(full_path, &st) == -1) {
+        char *not_found_msg = "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\n\r\n";
+        write(fd, not_found_msg, strlen(not_found_msg));
+    } else {
+        char header[2048];
+        int file_fd = open(full_path, O_RDONLY);
+        char *content_type = NULL;
+        if (strstr(file_path, ".png")) {
+            content_type = "image/png";
+        } else if (strstr(file_path, ".html")) {
+            content_type = "text/html";
+        }
+        sprintf(header, "HTTP/1.1 200 OK\r\nContent-Length: %ld\r\nContent-Type: %s\r\n\r\n", st.st_size, content_type);
+        write(fd, header, strlen(header));
+        char buffer[4096];
+        ssize_t bytes_read;
+        while ((bytes_read = read(file_fd, buffer, sizeof(buffer))) > 0) {
+            write(fd, buffer, bytes_read);
+        }
+        close(file_fd);
     }
-
-    // 6. Clean Up and Close
-    close(file_fd);
     close(fd);
-    // You may also need to free the resources of the HTTPRequest (like headers) here if necessary
+    return NULL;
 }
 
 int main(int argc, char *argv[]) {
