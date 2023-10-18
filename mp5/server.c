@@ -13,8 +13,7 @@
 void *client_thread(void *vptr) {
     int fd = *((int *)vptr);
     HTTPRequest req;
-    
-    // 1. Parse the client's HTTP request
+    // parse req
     if (httprequest_read(&req, fd) < 0) {
         close(fd);
         return NULL;
@@ -42,8 +41,8 @@ void *client_thread(void *vptr) {
         write(fd, header, strlen(header));
         char buffer[4096];
         ssize_t bytes_read;
-        while ((bytes_read = read(file_fd, buffer, sizeof(buffer))) > 0) {
-            write(fd, buffer, bytes_read);
+            while ((bytes_read = read(file_fd, buffer, sizeof(buffer))) > 0) {
+                write(fd, buffer, bytes_read);
         }
         close(file_fd);
     }
