@@ -12,6 +12,7 @@
  */
 #include <string.h>
 ssize_t httprequest_parse_headers(HTTPRequest *req, char *buffer, ssize_t buffer_len) {
+    req->head = NULL;
     char *current = buffer;
     char *end = buffer + buffer_len;
     char *space1 = strchr(current, ' ');
