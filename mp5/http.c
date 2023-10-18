@@ -171,16 +171,16 @@ const char *httprequest_get_path(HTTPRequest *req) {
  * Destroys a `req`, freeing all associated memory.
  */
 void httprequest_destroy(HTTPRequest *req) {
-    free((void*)req->action);
-    free((void*)req->path);
-    free((void*)req->version);
-    free((void*)req->payload);
-    _Header *current = req->head;
-    while (current) {
-        _Header *next = current->next;
-        free(current->key);
-        free(current->value);
-        free(current);
-        current = next;
-    }
+    // free((void*)req->action);
+    // free((void*)req->path);
+    // free((void*)req->version);
+    // free((void*)req->payload);
+    // _Header *current = req->head;
+    // while (current) {
+    //     _Header *next = current->next;
+    //     free(current->key);
+    //     free(current->value);
+    //     free(current);
+    //     current = next;
+    // }
 }
