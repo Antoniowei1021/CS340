@@ -81,16 +81,11 @@ def POST_weather():
         "forecastTime": str(forecast_lookup_datetime), 
         **forecast
     }
-    # Update the cache before sending the response
     weather_cache = data
     cache_expiry = datetime.now() + CACHE_DURATION
     return jsonify(data)
 @app.route('/weatherCache')
 def get_cached_weather():
-    # Check if the cache is still valid
     if datetime.now() < cache_expiry and weather_cache:
         return jsonify(weather_cache)
     return jsonify({})
-
-if __name__ == "__main__":
-    app.run(debug=True)
