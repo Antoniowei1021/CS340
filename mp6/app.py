@@ -89,3 +89,5 @@ def get_cached_weather():
     if datetime.now() < cache_expiry and weather_cache:
         return jsonify(weather_cache)
     return jsonify({})
+if __name__ == "__main__":
+    app.run(debug=True)

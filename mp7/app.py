@@ -1,21 +1,40 @@
 from flask import Flask, render_template, send_file, request
 import os
-
+counter = 0    
 app = Flask(__name__)
 
+def create_file():
+    global counter
+    filename = f"file_{counter}.gif"
+    return filename
 # Route for "/" for a web-based interface to this micro-service:
+
 @app.route('/')
 def index():
   return render_template("index.html")
-
-
 # Extract a hidden "uiuc" GIF from a PNG image:
 @app.route('/extract', methods=["POST"])
 def extract_hidden_gif():
-  # ...
+  global counter
+  r = request.files['png']
+  r.save(r.filename)
+  os.system('make')
+  f_ = create_file()
+  result = os.system(f'./png-extractGIF {r.filename} {f_}')
+  result = os.waitstatus_to_exitcode(result)
+  if result == 0:
+    counter += 1
+    return send_file(f_)
+  elif result == 254:
+      return "There's no hidden GIF", 415
+  else:
+      return "Invalid PNG type", 422
 
 # Get the nth saved "uiuc" GIF:
 @app.route('/extract/<int:image_num>', methods=['GET'])
 def extract_image(image_num):
-  # ...
+    filename = f'file_{image_num}.gif'
+    if os.path.exists(filename):
+        return send_file(filename)
+    return "Not found", 404
   

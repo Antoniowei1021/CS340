@@ -73,7 +73,7 @@ size_t PNG_read(PNG *png, PNG_Chunk *chunk) {
   //data
    chunk->data = malloc(chunk->len);
     fread(chunk->data, 1, chunk->len, png->file);
-    free(chunk->data);  ew2q1`
+    free(chunk->data);  
   //crc
   uint32_t length1;
   fread(&length1, 1, 4, png->file);
