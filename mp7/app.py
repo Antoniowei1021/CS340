@@ -23,12 +23,12 @@ def extract_hidden_gif():
   os.system('make')
   f_ = create_file()
   result = os.system(f'./png-extractGIF {r.filename} {f_}')
-  result = os.waitstatus_to_exitcode(result)
-  print(result)
-  if result == 0:
+  result1 = os.waitstatus_to_exitcode(result)
+  print(result1)
+  if result1 == 0:
     counter += 1
     return send_file(f_)
-  elif result == 254:
+  elif result1 == 254:
       return "There's no hidden GIF", 415
   else:
       return "Invalid PNG type", 422
