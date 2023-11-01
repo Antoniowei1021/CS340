@@ -12,6 +12,7 @@ def create_file():
 @app.route('/')
 def index():
   return render_template("index.html")
+
 # Extract a hidden "uiuc" GIF from a PNG image:
 @app.route('/extract', methods=["POST"])
 def extract_hidden_gif():
