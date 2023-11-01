@@ -22,10 +22,16 @@ def extract_hidden_gif():
   os.system('make clean')
   os.system('make')
   f_ = create_file()
+  print(f"Executing: ./png-extractGIF {r.filename} {f_}")
   result = os.system(f'./png-extractGIF {r.filename} {f_}')
+  if os.path.exists(f_):
+    print(f"File {f_} created. Size: {os.path.getsize(f_)} bytes")
+  else:
+    print(f"File {f_} was not created.")
   result1 = os.waitstatus_to_exitcode(result)
   print(result1)
   if result1 == 0:
+    print(f"Sending file: {f_}")
     counter += 1
     return send_file(f_)
   elif result1 == 254:

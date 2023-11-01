@@ -2,4 +2,3 @@ flask
 pytest
 python-dotenv
 requests
-pandas
