@@ -19,10 +19,12 @@ def extract_hidden_gif():
   global counter
   r = request.files['png']
   r.save(r.filename)
+  os.system('make clean')
   os.system('make')
   f_ = create_file()
   result = os.system(f'./png-extractGIF {r.filename} {f_}')
   result = os.waitstatus_to_exitcode(result)
+  print(result)
   if result == 0:
     counter += 1
     return send_file(f_)
