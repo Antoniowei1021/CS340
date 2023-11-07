@@ -228,7 +228,7 @@ def test_cache(start_microservice, test_client):
     r = test_client.get('/storage')
     assert(r.status_code == 200)
 
-    # 5 images should be in the cache
+    #5 images should be in the cache
     assert(len(r.get_json()) == 5)
 
 

@@ -35,6 +35,7 @@ def POST_weather():
     if len(number) > 3:
         return "Invalid course format", 400
     server_url = os.getenv('COURSES_MICROSERVICE_URL')
+    print(server_url)
     response = requests.get(f"{server_url}/{major}/{number}")
     if response.status_code != 200:
         return "Course not found", 400
