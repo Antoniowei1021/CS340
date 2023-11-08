@@ -19,6 +19,7 @@ def MandelbrotSetImage(palette, center_real, center_imag, height, dim, iteration
 
 @app.route('/mandelbrot/<colormap>/<float(signed=True):real>:<float(signed=True):imag>:<float:height>:<int:dim>:<int:iter>', methods=['GET'])
 def waf(colormap, real, imag, height, dim, iter):
+  print("hello")
   try:
     colormap = matplotlib.cm.get_cmap(colormap).colors
     palette = denormalize(colormap)
