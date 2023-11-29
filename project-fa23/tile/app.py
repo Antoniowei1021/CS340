@@ -1,19 +1,41 @@
 import requests
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, request, jsonify
+from PIL import Image
 
+
+cache_data = None
+
+info = {
+    "author" : "Eric Wei",
+    "url": "http://127.0.0.1:34000/",
+    "token" : "ab922882-1605-431f-8326-893b0a93e320"
+}
+url = 'http://127.0.0.1:5000/registerClient/chiwei2'
+result = requests.put(url, json=info).json()
+print(result)
+ 
 app = Flask(__name__)
 
-servers = []
+resized_img = Image.open('Gibson.jpg')
+resized_img = resized_img.resize((result['xdim'] * result['tilesize'], result['ydim'] * result['tilesize']))
+resized_img.save("resized_image.png")
+
+base_url = "http://127.0.0.1:5000"
+with open("resized_image.png", 'rb') as image_file:
+    files = {'image': image_file}
+    response = requests.post(f"{base_url}/registerImage/chiwei2", files=files)
+    print(response.status_code)
 
 @app.route('/registered', methods=["PUT"])
-    # puts a json with
-    # authtoken : auth token from the server
-    # approved : the string true or false
-    # voteToken : auth token for voting if approved is true
-    # xloc : int //tile location
-    # yloc : in // tile location
+def PUT_registered():
+    global cache_data
+    data = request.get_json()
+    cache_data = data
+    if data["approved"] == 'true':
+        if data["authToken"] != info["token"]:
+            return "Authorization token invalid", 455
+        else:
+            return "Success", 200
+    return "Not approved", 456
+        
 
-    # 455 "Authorization token invalid" if auth token does not match
-
-    # otherwise return 200 "success"
-def PUT_registered()

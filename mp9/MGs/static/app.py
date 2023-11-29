@@ -6,13 +6,11 @@ from flask import Flask, jsonify, render_template, request
 
 
 
-response = requests.put('http://127.0.0.1:5001/addMG', json = {
+response = requests.put('http://fa23-cs340-adm.cs.illinois.edu:5000/addMG', json = {
   "name": "My_maze",
-  "url": "http://127.0.0.1:5002/",
+  "url": "http://fa23-cs340-025.cs.illinois.edu:34000/",
   "author": "Eric Wei"
 })
-
-print(response.status_code)
 
 app = Flask(__name__)
 @app.route('/generate', methods=['GET'])

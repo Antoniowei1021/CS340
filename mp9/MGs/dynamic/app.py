@@ -94,9 +94,9 @@ weights = []
 
 
 
-response = requests.put('http://127.0.0.1:5001/addMG', json = {
+response = requests.put('http://fa23-cs340-adm.cs.illinois.edu:5000/addMG', json = {
   "name": "My_maze",
-  "url": "http://127.0.0.1:5002/",
+  "url": "http://fa23-cs340-025.cs.illinois.edu:34000/",
   "author": "Eric Wei"
 })
 # lists of MG names and weights for random.choices
@@ -106,7 +106,6 @@ app = Flask(__name__)
 
 @app.route('/generate', methods=['GET'])
 def gen_maze_segment():
-
     maze = SquareMaze(7, 7)
     maze.makeMaze()
     maze_string = maze_to_string(maze.maze)
