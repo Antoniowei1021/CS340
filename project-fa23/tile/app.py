@@ -1,7 +1,8 @@
 import requests
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from PIL import Image
 
+app = Flask(__name__)
 
 cache_data = None
 
@@ -13,18 +14,29 @@ info = {
 url = 'http://127.0.0.1:5000/registerClient/chiwei2'
 result = requests.put(url, json=info).json()
 print(result)
- 
-app = Flask(__name__)
 
-resized_img = Image.open('Gibson.jpg')
-resized_img = resized_img.resize((result['xdim'] * result['tilesize'], result['ydim'] * result['tilesize']))
-resized_img.save("resized_image.png")
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-base_url = "http://127.0.0.1:5000"
-with open("resized_image.png", 'rb') as image_file:
-    files = {'image': image_file}
-    response = requests.post(f"{base_url}/registerImage/chiwei2", files=files)
-    print(response.status_code)
+@app.route('/uploadImage', methods=["POST"])
+def POST_upload_Image():
+    resized_img = Image.open('Gibson.jpg')
+    resized_img = resized_img.resize((result['xdim'] * result['tilesize'], result['ydim'] * result['tilesize']))
+    resized_img.save("resized_image.png")
+
+    base_url = "http://127.0.0.1:5000"
+    with open("resized_image.png", 'rb') as image_file:
+        files = {'image': image_file}
+        response = requests.post(f"{base_url}/registerImage/chiwei2", files=files)
+        print(response.status_code)
+        if response.status_code == 500:
+            return "Invalid size", response.status_code
+        elif response.status_code == 416:
+            return "No clientID", response.status_code
+        else:
+            return "Success", 200
+    
 
 @app.route('/registered', methods=["PUT"])
 def PUT_registered():
