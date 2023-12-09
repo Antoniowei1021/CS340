@@ -139,12 +139,3 @@ def GET_registeredTest():
 def GET_image(clientID, imageFileName):
     return send_file(f"uploads/{clientID}/{imageFileName}", mimetype='image/png') 
 
-@app.route('/vote/<clientID>', methods=["PUT"])
-def PUT_vote(clientID):
-    data = request.get_json()
-    global currentClientID, current_x, current_y, currentVotes
-    currentClientID = clientID
-    currentVotes = data["voteToken"]
-    current_x = data["xloc"]
-    current_y = data["yloc"]
-    return "ok", 200
