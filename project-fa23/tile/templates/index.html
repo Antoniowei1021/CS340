@@ -1,32 +1,24 @@
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <title>CS 340: PNG Microservice</title>
-  </head>
-  <body>
-    <div class="container">
-      <h1>Register Tile Server</h1>
-      <form method="POST" action="/registerServer">
-        <div class="form-group">
-          <label for="registerServer">Register with Canvas Server</label>
-          <input type="submit" class="btn btn-primary" value="Register">
-        </div>
-      </form>
-
-      <h2>Select Image for Tile Server</h2>
-      <form method="POST" enctype="multipart/form-data" action="/uploadImage">
+</head>
+<body>
+<div class="container">
+    <h2>Select Image for Tile Server</h2>
+    <!-- Existing form for image upload -->
+    <form method="POST" enctype="multipart/form-data" action="/uploadImage">
         <div class="form-group">
           <label for="file">PNG File</label>
           <input type="file" class="form-control" id="file" name="file">
           <button type="submit" class="btn btn-primary">Upload</button>
         </div>
       </form>
-
-      <h2>Vote for a Tile</h2>
-      <form method="POST" action="/voteForTile">
+    <h2>Vote for a Tile</h2>
+    <form method="POST" action="/voteForTile">
         <div class="form-group">
           <label for="tileX">Tile X Coordinate</label>
           <input type="number" class="form-control" id="tileX" name="tileX">
@@ -36,13 +28,14 @@
         </div>
       </form>
 
-      <h2>Tile Server Status</h2>
-      <button type="button" class="btn btn-primary" onclick="getStatus()">Get Status</button>
-      <div id="status">
+    <h2>Tile Server Status</h2>
+    <form method="GET" action="/status">
+      <div class="form-group">
+        <p>Approval Status: <span id="approvalStatus">Not available</span></p>
+        <p>Tile Location: X - <span id="tileXLocation">Not available</span>, Y - <span id="tileYLocation">Not available</span></p>
+        <button type="submit" class="btn btn-primary">Get</button>
       </div>
-    </div>
-
-    <script>
-    </script>
-  </body>
+</div>
+</script>
+</body>
 </html>

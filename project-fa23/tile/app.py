@@ -155,5 +155,17 @@ def put_update():
         return jsonify({"message": "Tile updated successfully"}), 200
     else:
         return jsonify({"error": "Failed to update tile"}), 500
-      
+    
+@app.route('/status', methods=["GET"])
+def get_status():
+    global cache_data
+    if cache_data is None:
+        return jsonify({"error": "No data available"}), 404
+
+    status = {
+        "approved": cache_data.get("approved", False),
+        "xloc": cache_data.get("xloc", "Not available"),
+        "yloc": cache_data.get("yloc", "Not available")
+    }
+    return jsonify(status), 200
     
