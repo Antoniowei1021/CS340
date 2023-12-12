@@ -4,6 +4,8 @@ from PIL import Image
 import io
 app = Flask(__name__)
 i = 0
+max_nb = 0
+max_url = None
 cache_data = None
 resp = None
 image_list = ["cme.png", "fender_customshop.png", "Gibson.png", "f.png", "g.png"]
@@ -12,7 +14,6 @@ info = {
     "url": "http://fa23-cs340-025.cs.illinois.edu:34000/",
     "token" : "ab922882-1605-431f-8326-893b0a93e320"
 }
-
 url1 = 'http://fa23-cs340-adm.cs.illinois.edu:5000/registerClient/chiwei2'
 result = requests.put(url1, json=info).json()
 
@@ -105,12 +106,12 @@ def put_votes():
         "votes": data["votes"],
         "seq": data["seq"]
     }
-    print(resp)
     return "Votes updated", 200
 
 @app.route('/voteForTile', methods=['POST'])
 def vote_tile():
     base_url = "http://fa23-cs340-adm.cs.illinois.edu:5000"
+    print(request.form)
     xloc = request.form.get('tileX')
     yloc = request.form.get('tileY')
     input =  {
@@ -122,3 +123,37 @@ def vote_tile():
     if resp.status_code == 200:
         return "done", resp.status_code
     return "Error", resp.status_code
+
+@app.route('/update', methods=["PUT"])
+def put_update():
+    current_votes = resp.get("votes", 0) if resp else 0
+    global max_nb 
+    data = request.get_json()
+    print(data)
+    if not data or 'authToken' not in data or 'neighbors' not in data:
+        return jsonify({"error": "Invalid request"}), 400
+    # Check if the token match
+    if data["authToken"] != info["token"]:
+        return "Unauthorized", 401
+    neighbors = data['neighbors']
+    for nb in neighbors:
+        # pass urls
+        print(1)
+        response = requests.get(f"{nb}/votes")
+        nb_votes = response.json()["votes"]
+        if max_nb < nb_votes and nb_votes > current_votes:
+            max_nb = nb_votes
+            max_url = nb
+    if max_nb == 0:
+        return "No update needed", 201
+    new_responses = requests.get(f"{max_url}/image")
+    with open("updated_image.png", "wb") as f:
+        f.write(new_responses.content)
+    Image.open("updated_image.png").save("resized_image.png", format='PNG')
+    update_success = True
+    if update_success:
+        return jsonify({"message": "Tile updated successfully"}), 200
+    else:
+        return jsonify({"error": "Failed to update tile"}), 500
+      
+    
