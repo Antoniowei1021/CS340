@@ -14,7 +14,7 @@ info = {
     "url": "http://fa23-cs340-025.cs.illinois.edu:34000/",
     "token" : "ab922882-1605-431f-8326-893b0a93e320"
 }
-url1 = 'http://fa23-cs340-adm.cs.illinois.edu:5000/registerClient/chiwei2'
+url1 = 'http://fa23-cs340-adm.cs.illinois.edu:23000/registerClient/chiwei2'
 result = requests.put(url1, json=info).json()
 
 @app.route('/')
@@ -31,7 +31,7 @@ def POST_upload_Image():
         img = Image.open(file.stream)
         resized_img = img.resize((result['xdim'] * result['tilesize'], result['ydim'] * result['tilesize']))
         resized_img.save("resized_image.png", format='PNG')
-        base_url = "http://fa23-cs340-adm.cs.illinois.edu:5000"
+        base_url = "http://fa23-cs340-adm.cs.illinois.edu:23000"
         with open("resized_image.png", 'rb') as image_file:
             files = {'file': image_file}
             response = requests.post(f"{base_url}/registerImage/chiwei2", files=files)
@@ -52,7 +52,6 @@ def PUT_registered():
     print(cache_data)
     if cache_data["approved"] == True:
         if cache_data["authToken"] != info["token"]:
-            vote_tok = cache_data["voteToken"]
             return "Authorization token invalid", 455
         else:
             return "Success", 200
@@ -62,7 +61,7 @@ def PUT_registered():
 def get_image():
     global cache_data
     # Check if an image has been approved
-    if cache_data and cache_data["approved"] == True:
+    if cache_data and cache_data["approved"]:
         return send_file("resized_image.png", mimetype='image/png')
     else:
          # if no image is approved
@@ -110,7 +109,7 @@ def put_votes():
 
 @app.route('/voteForTile', methods=['POST'])
 def vote_tile():
-    base_url = "http://fa23-cs340-adm.cs.illinois.edu:5000"
+    base_url = "http://fa23-cs340-adm.cs.illinois.edu:23000"
     print(request.form)
     xloc = request.form.get('tileX')
     yloc = request.form.get('tileY')

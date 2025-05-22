@@ -95,7 +95,7 @@ def mandelbrot():
         print(s3.list_buckets())
         print("Created `mybucket` bucket!")
     except:
-  # bucket already exists
+    # bucket already exists
         print("Bucket `mybucket` already exists!")
         # try to download the file using the url, if not, then this is an error, and upload        
         # get the url
