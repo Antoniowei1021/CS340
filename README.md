@@ -28,4 +28,7 @@ Brief introduction about the course and its objectives.
 Mp 0 was just an introduction to C and nothing else. This MP asked us to familiarize with VSCode, and taught us how to debug using break points and code stepping.
 
 ### Mp 1 
+
+Mp 1 Best Believe I'm Still 💎💎💎
+This MP asked us to work with UTF-8 emojis. I learned that the emojis were encoded in 4 hexdecimal chunks. The MP was a great start in teaching us how to use malloc and free, as well as other basic C functions. I realized that C was extremely fundamental that it was coded according to memory locations. 
       
