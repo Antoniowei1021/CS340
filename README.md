@@ -39,4 +39,37 @@ This MP continued on working with basic C functions, but this time we worked wit
 ### Mp 3
 Mp 3 Alloc Too Well
 This MP gave me the deepest impression. It asked us to implement the basic malloc and free and derivative functions from scratch. And it was not just simple memory application, it required block splitting(splitting a larger block into a smaller one if there was more space for further use), memory coalescing(coalesce two consecutive freed blocks into one larger), free list(use linked list to store the freed blocks).
+
+### Mp 4
+Mp 4 My Resource in your Wallet
+Build a thread-safe resource wallet and a multi-threaded server that allows multiple clients to interact with the wallet concurrently over a network.
+
+### Mp 5
+Mp 5 Getaway.html
+Implement a multi-threaded HTTP server from scratch that:
+Parses HTTP requests
+Reads from sockets
+Serves static .html and .png files
+Understands and responds to browser requests using standard HTTP format
+
+### Mp 6
+Mp 6 Midnight Rain
+Starting from this MP, the class changed its focus to python and networking services. This MP asked me to create a weather forecasting system based on the class schedule and the national weather service API. First I requested the course microservice to handle me the courses information to strip off any irrelevant characters, then I check the forecast to calculate the next meeting time, and return a json file with temperature, short forcast, course name, next meeting time and the forecast hour.
+
+### Mp 7 
+Mp 7 Dancing with Our C Code
+This MP was the continuation of MP 2, but it just connected the MP 2 server to Mp 7 and to extract a hidden gif out of the png file.
+
+### Mp 8
+Mp 8 Come Back... Be Cached (Mandelbrot's Version)
+This was one of the most interesting MP I've ever done in this course. In this MP we get the first impression on AWS storage like boto3. We created some small apis to manipulate the mandelbrot image, and how to load it onto our microservice for display. It was interactive so it was easy to test what we did. 
+
+### Mp 9
+Mp 9 Bigger Than the Whole Maze
+This Mp was a project for the entire class to cooperate. I was asked to create a 7*7 matrix that represents a maze. Then, every student would join a large server to combine their work into an infinite maze. In this particular MP, I utilized code from one previous course, which happened to be creating mazes as well. I transcripted that code from C++ to python and it worked exactly what I wanted. 
+
+### Final Project
+This Final Project was also a collaborative project. Everyone would try to upload a list of images, and they would vote for each other. The one with the highest number of votes would start to conquer other areas(and devour other images). Eventually, one final image would stand out. But unfortunately, the display of this project was failed for some technical issues.
+
+
       
